@@ -1,6 +1,6 @@
 {
   "name": "template-transformer",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Transform jsons using templates",
   "main": "build/transform.js",
   "scripts": {
