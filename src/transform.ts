@@ -1,0 +1,140 @@
+import { evaluate } from './eval';
+import { compact } from './compact';
+import { TemplateKeyType, TemplateValueType } from './value-key-types';
+
+export function getTransformer(template, options?: { dropValues?: any[]; cb?: () => any }) {
+  return ($, $1) => transform(template, { ...options, $, $1 });
+}
+
+export function transform(
+  template,
+  {
+    dropValues = ['', null, undefined],
+    $1,
+    $,
+    cb = (x) => x,
+  }: { dropValues?: any[]; $1?: any; $: any; cb?: (key: any) => any }
+) {
+  const propertyType = getValueType(template);
+  return process()[propertyType](template, { dropValues, $1, $, transform, cb });
+}
+
+function getValueType(template) {
+  switch (typeof template) {
+    case 'number':
+      return TemplateValueType.LITERAL_NUMBER;
+    case 'string':
+      return template.startsWith('$.') || template.startsWith('$1.') || template === '$' || template === '$1'
+        ? TemplateValueType.JSON_PATH
+        : TemplateValueType.LITERAL_STRING;
+    case 'boolean':
+      return TemplateValueType.LITERAL_BOOLEAN;
+    case 'object':
+      return Array.isArray(template) ? TemplateValueType.ARRAY : TemplateValueType.OBJECT;
+    case 'function':
+      return TemplateValueType.FUNCTION;
+    default:
+      throw new TypeError(`Undefined template: ${template}`);
+  }
+}
+
+function process() {
+  const literalCb = (template, options) => options.cb(compact(template, [], options.dropValues));
+  return {
+    [TemplateValueType.LITERAL_NUMBER]: literalCb,
+    [TemplateValueType.LITERAL_STRING]: literalCb,
+    [TemplateValueType.LITERAL_BOOLEAN]: literalCb,
+    [TemplateValueType.FUNCTION](template, options) {
+      try {
+        return transform(template(options.$, options.$1), options);
+      } catch (e) {
+        //
+      }
+    },
+    [TemplateValueType.ARRAY](template, options) {
+      return compact(template.map((t) => transform(t, options)));
+    },
+    [TemplateValueType.JSON_PATH](template, options) {
+      return options.cb(compact(evaluate(options.$, template, options.$1), [], options.dropValues));
+    },
+    [TemplateValueType.OBJECT](template, options) {
+      if (template === null && compact(null, [], options.dropValues) !== undefined) return null;
+      const result = {};
+      let checkIf = [];
+      // tslint:disable-next-line: forin
+      for (let key in template) {
+        let keyType = getTemplateKeyType(key);
+        let destKey = key;
+        switch (keyType) {
+          case TemplateKeyType.TYPE_ARRAY: {
+            destKey = getArrayKey(key);
+            let originObj: any[] = getOriginArray(key, options);
+            if (!Array.isArray(originObj) && originObj) {
+              console.warn(`Warning: ${getOriginArrayKey(key)} is not an Array: ${originObj}`);
+              break;
+            }
+            let value = originObj
+              ?.map((o, index, array) => {
+                const $ = {
+                  $: o,
+                  $index: index,
+                  $array: originObj,
+                  '': options.$,
+                  ...o,
+                };
+                return transform(template[key], { ...options, $ });
+              })
+              .filter((x) => compact(x, [], options.dropValues) !== undefined);
+            if (result[destKey]?.length > 0) value.unshift(...result[destKey]);
+            result[destKey] = value;
+            break;
+          }
+          case TemplateKeyType.DUPLICATE:
+            destKey = getDuplicateDestKey(key);
+          // tslint:disable-next-line: no-switch-case-fall-through
+          case TemplateKeyType.SIMPLE: {
+            let value = transform(template[key], options);
+            if (Array.isArray(value) && result[destKey]?.length > 0) value.unshift(...result[destKey]);
+            result[destKey] = value;
+            break;
+          }
+          case TemplateKeyType.TEMPLATE: {
+            let newKey = transform(key, options);
+            let value = transform(template[key], options);
+            if (Array.isArray(value) && result[newKey]?.length > 0) value.unshift(...result[newKey]);
+            result[newKey] = value;
+            break;
+          }
+          case TemplateKeyType.IF:
+            checkIf = template[key];
+            break;
+        }
+      }
+      return compact(result, checkIf, options.dropValues);
+    },
+  };
+}
+
+function getDuplicateDestKey(key: string): string {
+  return key.split('.$')[0];
+}
+
+function getTemplateKeyType(key: string) {
+  if (key.indexOf('[$') > 0 && key.indexOf(']') > 0) return TemplateKeyType.TYPE_ARRAY;
+  if (key.startsWith('$.') && !key.startsWith('$..')) return TemplateKeyType.TEMPLATE;
+  if (key.indexOf('.$') > 0 && key.indexOf('..$') === -1) return TemplateKeyType.DUPLICATE;
+  if (key === '$if') return TemplateKeyType.IF;
+  return TemplateKeyType.SIMPLE;
+}
+
+function getArrayKey(key: string) {
+  return key.split('[$')[0];
+}
+
+function getOriginArrayKey(key: string) {
+  return key.split('[')[1].split(']')[0];
+}
+
+function getOriginArray(key, options) {
+  return evaluate(options.$, getOriginArrayKey(key), options.$1);
+}
