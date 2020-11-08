@@ -1,0 +1,59 @@
+{
+  "name": "template-transformer",
+  "version": "0.0.1",
+  "description": "Transform jsons using templates",
+  "main": "build/transform.js",
+  "scripts": {
+    "clean": "rm -rf ./build",
+    "prebuild": "npm run clean",
+    "build": "tsc -p src",
+    "prewatch": "npm run clean",
+    "watch": "tsc -w -p src",
+    "prepublishOnly": "npm run build && npm test",
+    "pretest": "tslint --project ./src/ && tslint ./test/**/*.ts && npm run build",
+    "test": "nyc mocha",
+    "prepare": "npm run build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nikostoulas/template-transformer.git"
+  },
+  "keywords": [
+    "json",
+    "transform",
+    "template",
+    "jsonPath",
+    "json",
+    "path"
+  ],
+  "author": "Nikos Kostoulas",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nikostoulas/template-transformer/issues"
+  },
+  "nyc": {
+    "include": [
+      "src/**/*.ts"
+    ],
+    "extension": [
+      ".ts"
+    ],
+    "reporter": [
+      "text-summary",
+      "html"
+    ],
+    "sourceMap": true,
+    "instrument": true
+  },
+  "homepage": "https://github.com/transform#readme",
+  "devDependencies": {
+    "@types/mocha": "^8.0.3",
+    "mocha": "^8.2.1",
+    "nyc": "^15.1.0",
+    "should": "^13.2.3",
+    "ts-node": "^9.0.0",
+    "tsconfig-paths": "^3.9.0",
+    "tslint": "^6.1.3",
+    "typescript": "^4.0.5"
+  }
+}
