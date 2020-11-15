@@ -1,4 +1,4 @@
-# meta-morphosis
+# metamorphosi
 
 Node.js module that is used to transform input - $ or $1 - jsons based on templates
 
@@ -7,7 +7,7 @@ Node.js module that is used to transform input - $ or $1 - jsons based on templa
 ## Builder
 
 ```js
-const { getTransform } = require('meta-morphosis');
+const { getTransform } = require('metamorphosi');
 const transform = getTransform(template, options);
 transform($, $1);
 ```
@@ -28,7 +28,7 @@ a function that when given two inputs will tranform them and produced 1 output b
 ## Transform with all options
 
 ```js
-const {transform} = require('meta-morphosis');
+const {transform} = require('metamorphosi');
 const transform(template, options)
 ```
 
@@ -52,7 +52,7 @@ tranformed inputs based on the template and $, $1. The output type is very simil
 # Usage
 
 ```js
-const {getTransform} = require('meta-morphosis');
+const {getTransform} = require('metamorphosi');
 
 /** A template example */
 const template = {
