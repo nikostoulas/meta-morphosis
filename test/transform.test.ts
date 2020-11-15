@@ -1,5 +1,5 @@
 import * as should from 'should';
-import { getTransformer, transform } from '../src/transform';
+import { getTransform, transform } from '../src/transform';
 
 describe('transform', function () {
   context('template value is literal number', function () {
@@ -68,13 +68,13 @@ describe('transform', function () {
       transform(['$', '$.a', '$.a.b', '$.a.b.c'], { dropValues: [null, undefined], $: { a: { b: 1 } } }).should.eql([
         { a: { b: 1 } },
         { b: 1 },
-        1,
+        1
       ]);
 
       transform(['$1', '$1.a', '$1.a.b', '$1.a.b.c'], {
         $: { a: { b: 1 } },
         dropValues: [null, undefined],
-        $1: { a: { b: 2 } },
+        $1: { a: { b: 2 } }
       }).should.eql([{ a: { b: 2 } }, { b: 2 }, 2]);
     });
   });
@@ -83,7 +83,7 @@ describe('transform', function () {
     context('if is not used', function () {
       it('returns all values that it finds', function () {
         transform({ a: '$.a', b: '$.b.c.d' }, { dropValues: [null, undefined], $: { a: { b: 1 } } }).should.eql({
-          a: { b: 1 },
+          a: { b: 1 }
         });
       });
     });
@@ -94,10 +94,10 @@ describe('transform', function () {
           { a: '$.a', b: '$.b.c.d', $if: ['a'] },
           {
             $: { a: { b: 1 } },
-            dropValues: [null, undefined],
+            dropValues: [null, undefined]
           }
         ).should.eql({
-          a: { b: 1 },
+          a: { b: 1 }
         });
       });
     });
@@ -110,7 +110,7 @@ describe('transform', function () {
             { a: '$.a', b: '$.b.c.d', $if: ['a', 'b'] },
             {
               $: { a: { b: 1 } },
-              dropValues: [null, undefined],
+              dropValues: [null, undefined]
             }
           )
         );
@@ -135,9 +135,9 @@ describe('transform', function () {
                   array: '$.$array',
                   parentArray: '$..$array',
                   parentObj: '$....',
-                  value: '$',
-                },
-              },
+                  value: '$'
+                }
+              }
             },
             { $: { array: [[1], [2], [3, 4]] } }
           ).should.eql({
@@ -150,9 +150,9 @@ describe('transform', function () {
                     array: [1],
                     parentArray: [[1], [2], [3, 4]],
                     parentObj: { array: [[1], [2], [3, 4]] },
-                    value: 1,
-                  },
-                ],
+                    value: 1
+                  }
+                ]
               },
               {
                 b: [
@@ -162,9 +162,9 @@ describe('transform', function () {
                     array: [2],
                     parentArray: [[1], [2], [3, 4]],
                     parentObj: { array: [[1], [2], [3, 4]] },
-                    value: 2,
-                  },
-                ],
+                    value: 2
+                  }
+                ]
               },
               {
                 b: [
@@ -174,7 +174,7 @@ describe('transform', function () {
                     array: [3, 4],
                     parentArray: [[1], [2], [3, 4]],
                     parentObj: { array: [[1], [2], [3, 4]] },
-                    value: 3,
+                    value: 3
                   },
                   {
                     index: 1,
@@ -182,11 +182,11 @@ describe('transform', function () {
                     array: [3, 4],
                     parentArray: [[1], [2], [3, 4]],
                     parentObj: { array: [[1], [2], [3, 4]] },
-                    value: 4,
-                  },
-                ],
-              },
-            ],
+                    value: 4
+                  }
+                ]
+              }
+            ]
           });
         });
 
@@ -209,10 +209,10 @@ describe('transform', function () {
           transform({ 'a.$1': [1, 2], 'a[$]': '$' }, { $: [3, 4] }).should.eql({ a: [1, 2, 3, 4] });
           transform({ 'a[$.a]': '$', 'a[$.b]': '$' }, { $: { a: [1, 2], b: [3, 4] } }).should.eql({ a: [1, 2, 3, 4] });
           transform({ 'a[$.a]': '$', '$.c': '$.b' }, { $: { a: [1, 2], b: [3, 4], c: 'a' } }).should.eql({
-            a: [1, 2, 3, 4],
+            a: [1, 2, 3, 4]
           });
           transform({ '$.c': '$.b', 'a[$.a]': '$' }, { $: { a: [1, 2], b: [3, 4], c: 'a' } }).should.eql({
-            a: [3, 4, 1, 2],
+            a: [3, 4, 1, 2]
           });
         });
       });
@@ -238,7 +238,7 @@ describe('transform', function () {
 
     it('executes the fuction and returns its value', function () {
       transform(() => '$.a', { dropValues: [undefined, null], $: { a: 1 }, $1: { b: 1 } }).should.equal(1);
-      transform(($) => $.a, { dropValues: [undefined, null], $: { a: 1 }, $1: { b: 1 } }).should.equal(1);
+      transform($ => $.a, { dropValues: [undefined, null], $: { a: 1 }, $1: { b: 1 } }).should.equal(1);
     });
   });
 
@@ -251,16 +251,16 @@ describe('transform', function () {
   context('transform function is given', function () {
     it('is applied to all values', function () {
       transform(
-        { a: '$.a', 'b[$.b]': '$', c: '$.c', '$.d': '$.d', e: ($) => $.e },
-        { $: { a: 1, b: [1, 2, 3], c: '3', d: 4, e: 5 }, cb: (x) => x + 1 }
+        { a: '$.a', 'b[$.b]': '$', c: '$.c', '$.d': '$.d', e: $ => $.e },
+        { $: { a: 1, b: [1, 2, 3], c: '3', d: 4, e: 5 }, cb: x => x + 1 }
       ).should.eql({ a: 2, b: [2, 3, 4], c: '31', 5: 5, e: 6 });
     });
   });
 });
 
-describe('getTransformer', function () {
+describe('getTransform', function () {
   it('gets transformer to be used multiple times', function () {
-    const transformer = getTransformer({ a: '$.a', b: '$1.b' });
+    const transformer = getTransform({ a: '$.a', b: '$1.b' });
     transformer({ a: 1 }, { b: 2 }).should.eql({ a: 1, b: 2 });
     transformer({ a: 4 }, { b: 5 }).should.eql({ a: 4, b: 5 });
   });

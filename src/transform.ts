@@ -2,19 +2,27 @@ import { evaluate } from './eval';
 import { compact } from './compact';
 import { TemplateKeyType, TemplateValueType } from './value-key-types';
 
+/**
+ * @deprecated
+ */
 export function getTransformer(template, options?: { dropValues?: any[]; cb?: () => any }) {
+  console.log('Use getTrasform instead of getTrasnformer');
   return ($, $1) => transform(template, { ...options, $, $1 });
 }
 
-export function transform(
-  template,
+export function getTransform<T>(template: T, options?: { dropValues?: any[]; cb?: () => any }) {
+  return ($, $1) => transform(template, { ...options, $, $1 });
+}
+
+export function transform<T>(
+  template: T,
   {
     dropValues = ['', null, undefined],
     $1,
     $,
-    cb = (x) => x,
+    cb = x => x
   }: { dropValues?: any[]; $1?: any; $: any; cb?: (key: any) => any }
-) {
+): Partial<T> {
   const propertyType = getValueType(template);
   return process()[propertyType](template, { dropValues, $1, $, transform, cb });
 }
@@ -52,7 +60,7 @@ function process() {
       }
     },
     [TemplateValueType.ARRAY](template, options) {
-      return compact(template.map((t) => transform(t, options)));
+      return compact(template.map(t => transform(t, options)));
     },
     [TemplateValueType.JSON_PATH](template, options) {
       return options.cb(compact(evaluate(options.$, template, options.$1), [], options.dropValues));
@@ -80,11 +88,11 @@ function process() {
                   $index: index,
                   $array: originObj,
                   '': options.$,
-                  ...o,
+                  ...o
                 };
                 return transform(template[key], { ...options, $ });
               })
-              .filter((x) => compact(x, [], options.dropValues) !== undefined);
+              .filter(x => compact(x, [], options.dropValues) !== undefined);
             if (result[destKey]?.length > 0) value.unshift(...result[destKey]);
             result[destKey] = value;
             break;
@@ -111,7 +119,7 @@ function process() {
         }
       }
       return compact(result, checkIf, options.dropValues);
-    },
+    }
   };
 }
 

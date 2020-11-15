@@ -1,5 +1,4 @@
 export enum TemplateKeyType {
-  LITERAL_NUMBER,
   TYPE_ARRAY,
   DUPLICATE,
   SIMPLE,
