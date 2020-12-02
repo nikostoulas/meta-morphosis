@@ -1,6 +1,6 @@
 {
   "name": "metamorphosi",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "description": "Transform jsons using templates",
   "main": "build/transform.js",
   "scripts": {
