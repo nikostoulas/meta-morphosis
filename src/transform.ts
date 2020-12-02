@@ -81,20 +81,19 @@ function process() {
               console.warn(`Warning: ${getOriginArrayKey(key)} is not an Array: ${originObj}`);
               break;
             }
-            let value = originObj
-              ?.map((o, index, array) => {
-                const $ = {
-                  $: o,
-                  $index: index,
-                  $array: originObj,
-                  '': options.$,
-                  ...o
-                };
-                return transform(template[key], { ...options, $ });
-              })
-              .filter(x => compact(x, [], options.dropValues) !== undefined);
+            let value = originObj?.map((o, index, array) => {
+              const $ = {
+                $: o,
+                $index: index,
+                $array: originObj,
+                '': options.$,
+                ...o
+              };
+              return transform(template[key], { ...options, $ });
+            });
+
             if (result[destKey]?.length > 0) value.unshift(...result[destKey]);
-            result[destKey] = value;
+            result[destKey] = compact(value, [], options.dropValues);
             break;
           }
           case TemplateKeyType.DUPLICATE:

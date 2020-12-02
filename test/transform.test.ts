@@ -80,6 +80,12 @@ describe('transform', function () {
   });
 
   context('template value is object', function () {
+    context('nested obj', function () {
+      it('filters empty nesed objects', function () {
+        transform({ a: '$.a', b: { b: '$.b' } }, { $: { a: 1 } }).should.eql({ a: 1 });
+      });
+    });
+
     context('if is not used', function () {
       it('returns all values that it finds', function () {
         transform({ a: '$.a', b: '$.b.c.d' }, { dropValues: [null, undefined], $: { a: { b: 1 } } }).should.eql({
@@ -124,6 +130,11 @@ describe('transform', function () {
         });
       });
 
+      context('Obj is an empty array', function () {
+        it('returns undefined', function () {
+          should.equal(undefined, transform({ 'a[$]': '$' }, { $: [] }));
+        });
+      });
       context('obj is an array', function () {
         it('returns object with array', function () {
           transform(
