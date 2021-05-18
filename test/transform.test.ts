@@ -253,6 +253,22 @@ describe('transform', function () {
     });
   });
 
+  context('template value is undefined', function () {
+    it('returns undefined value', function () {
+      transform({ a: 'a', b: undefined }, { dropValues: [null], $: { a: 1 }, $1: { b: 1 } }).should.eql({
+        a: 'a',
+        b: undefined
+      });
+    });
+
+    it('returns undefined value from function', function () {
+      transform(() => ({ a: 'a', b: undefined }), { dropValues: [null], $: { a: 1 }, $1: { b: 1 } }).should.eql({
+        a: 'a',
+        b: undefined
+      });
+    });
+  });
+
   context('template is null and null is permitted', function () {
     it('returns null', function () {
       should.equal(undefined, transform(null, { $: {}, dropValues: [undefined] }));

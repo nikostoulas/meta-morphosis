@@ -3,7 +3,7 @@ export enum TemplateKeyType {
   DUPLICATE,
   SIMPLE,
   TEMPLATE,
-  IF,
+  IF
 }
 
 export enum TemplateValueType {
@@ -14,4 +14,5 @@ export enum TemplateValueType {
   ARRAY,
   OBJECT,
   FUNCTION,
+  UNDEFINED
 }

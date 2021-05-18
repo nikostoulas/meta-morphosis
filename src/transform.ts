@@ -41,6 +41,8 @@ function getValueType(template) {
       return Array.isArray(template) ? TemplateValueType.ARRAY : TemplateValueType.OBJECT;
     case 'function':
       return TemplateValueType.FUNCTION;
+    case 'undefined':
+      return TemplateValueType.UNDEFINED;
     default:
       throw new TypeError(`Undefined template: ${template}`);
   }
@@ -52,10 +54,12 @@ function process() {
     [TemplateValueType.LITERAL_NUMBER]: literalCb,
     [TemplateValueType.LITERAL_STRING]: literalCb,
     [TemplateValueType.LITERAL_BOOLEAN]: literalCb,
+    [TemplateValueType.UNDEFINED]: literalCb,
     [TemplateValueType.FUNCTION](template, options) {
       try {
         return transform(template(options.$, options.$1), options);
       } catch (e) {
+        console.warn(`Warning: ${e.message}`);
         //
       }
     },
