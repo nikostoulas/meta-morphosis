@@ -69,6 +69,18 @@ describe('compact', function () {
         should.equal(undefined, compact({ foo: 'bar', bar: 'foo', z: 'z' }, ['foo'], ['foo', 'bar']));
       });
     });
+
+    context('object that is empty with keep', function () {
+      it('returns undefined', function () {
+        compact({}, undefined, undefined, true).should.eql({});
+      });
+    });
+
+    context('object with some keysThatMustExist and keep', function () {
+      it('returns undefined', function () {
+        should.equal(undefined, compact({ foo: 'bar', bar: 'foo' }, ['foo', 'bar', 'z'], undefined, true));
+      });
+    });
   });
 
   context('input is literal value', function () {

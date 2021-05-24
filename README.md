@@ -245,6 +245,17 @@ transform({ ['$.foo']: 'foo', a: '$.bar', $if: ['a'] }, { $: { foo: 'bar' } }); 
 transform({ ['$.foo']: 'foo', a: '$.bar', $if: ['a'] }, { $: { foo: 'bar', bar: 'bar' } }); // { bar: 'foo', a: 'bar' }
 ```
 
+### KEEP
+
+Sometimes you want an object to be include even if it is empty.
+By default metamorphosi will drop empty objects. If you want to keep empty objects you can use the \$keep:true spetial key.
+
+eg:
+
+```js
+transform({ $keep:true }, { }); // {}
+```
+
 ## ARRAY
 
 As seen in some examples of object you can directly use arrays as deplates. The values of the array can be a valid template value

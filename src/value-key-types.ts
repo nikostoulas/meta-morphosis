@@ -3,7 +3,8 @@ export enum TemplateKeyType {
   DUPLICATE,
   SIMPLE,
   TEMPLATE,
-  IF
+  IF,
+  KEEP
 }
 
 export enum TemplateValueType {

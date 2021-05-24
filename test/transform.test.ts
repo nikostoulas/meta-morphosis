@@ -123,6 +123,33 @@ describe('transform', function () {
       });
     });
 
+    context('keep is used and object is empty', function () {
+      it('returns empty object', function () {
+        should.equal(
+          undefined,
+          transform(
+            { a: '$.b', b: '$.b.c.d', $keep: true, $if: ['a'] },
+            {
+              $: { a: { b: 1 } },
+              dropValues: [null, undefined]
+            }
+          )
+        );
+      });
+    });
+
+    context('Both keep and if are used and object does not contain all keys', function () {
+      it('returns empty object', function () {
+        transform(
+          { a: '$.b', b: '$.b.c.d', $keep: true },
+          {
+            $: { a: { b: 1 } },
+            dropValues: [null, undefined]
+          }
+        ).should.eql({});
+      });
+    });
+
     context('template key is type array', function () {
       context('Obj is not an array', function () {
         it('returns undefined', function () {

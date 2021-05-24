@@ -73,6 +73,7 @@ function process() {
       if (template === null && compact(null, [], options.dropValues) !== undefined) return null;
       const result = {};
       let checkIf = [];
+      let keep = false;
       // tslint:disable-next-line: forin
       for (let key in template) {
         let keyType = getTemplateKeyType(key);
@@ -119,9 +120,13 @@ function process() {
           case TemplateKeyType.IF:
             checkIf = template[key];
             break;
+          case TemplateKeyType.KEEP:
+            console.log(keep);
+            keep = template[key];
+            break;
         }
       }
-      return compact(result, checkIf, options.dropValues);
+      return compact(result, checkIf, options.dropValues, keep);
     }
   };
 }
@@ -135,6 +140,7 @@ function getTemplateKeyType(key: string) {
   if (key.startsWith('$.') && !key.startsWith('$..')) return TemplateKeyType.TEMPLATE;
   if (key.indexOf('.$') > 0 && key.indexOf('..$') === -1) return TemplateKeyType.DUPLICATE;
   if (key === '$if') return TemplateKeyType.IF;
+  if (key === '$keep') return TemplateKeyType.KEEP;
   return TemplateKeyType.SIMPLE;
 }
 
