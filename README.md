@@ -247,8 +247,8 @@ transform({ ['$.foo']: 'foo', a: '$.bar', $if: ['a'] }, { $: { foo: 'bar', bar: 
 
 ### KEEP
 
-Sometimes you want an object to be include even if it is empty.
-By default metamorphosi will drop empty objects. If you want to keep empty objects you can use the \$keep:true spetial key.
+Sometimes you want an object to be included even if it is empty.
+By default metamorphosi will drop empty objects. If you want to keep empty objects you can use the \$keep:true special key.
 
 eg:
 
