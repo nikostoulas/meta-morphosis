@@ -59,8 +59,7 @@ function process() {
       try {
         return transform(template(options.$, options.$1), options);
       } catch (e) {
-        console.warn(`Warning: ${e.message}`);
-        //
+        if (!e.message?.includes('Cannot read property')) console.warn(`Warning: ${e.message}`);
       }
     },
     [TemplateValueType.ARRAY](template, options) {
@@ -121,7 +120,6 @@ function process() {
             checkIf = template[key];
             break;
           case TemplateKeyType.KEEP:
-            console.log(keep);
             keep = template[key];
             break;
         }

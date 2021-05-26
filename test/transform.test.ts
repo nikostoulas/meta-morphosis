@@ -270,8 +270,36 @@ describe('transform', function () {
   });
 
   context('template value is function', function () {
+    let tmp;
+    before(function () {
+      tmp = console.warn;
+    });
+
+    after(function () {
+      console.warn = tmp;
+    });
+
     it('executes the fuction and returns its value', function () {
       transform(() => 'foo', { dropValues: [undefined, null], $: { a: 1 }, $1: { b: 1 } }).should.equal('foo');
+    });
+
+    it('executes the fuction and logs no warning', function () {
+      let args = [];
+      console.warn = (...params) => args.push(params);
+      transform($ => $.foo.bar, { dropValues: [undefined, null], $: { a: 1 }, $1: { b: 1 } });
+      args.should.eql([]);
+    });
+
+    it('executes the fuction and  logs waring', function () {
+      let args = [];
+      console.warn = (...params) => args.push(params);
+      transform(
+        () => {
+          throw new Error('test');
+        },
+        { dropValues: [undefined, null], $: { a: 1 }, $1: { b: 1 } }
+      );
+      args.should.eql([['Warning: test']]);
     });
 
     it('executes the fuction and returns its value', function () {
