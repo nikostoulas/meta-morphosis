@@ -49,7 +49,7 @@ function getValueType(template) {
 }
 
 function process() {
-  const literalCb = (template, options) => options.cb(compact(template, [], options.dropValues));
+  const literalCb = (template, options) => options.cb(compact(template, [], { dropValues: options.dropValues }));
   return {
     [TemplateValueType.LITERAL_NUMBER]: literalCb,
     [TemplateValueType.LITERAL_STRING]: literalCb,
@@ -66,10 +66,10 @@ function process() {
       return compact(template.map(t => transform(t, options)));
     },
     [TemplateValueType.JSON_PATH](template, options) {
-      return options.cb(compact(evaluate(options.$, template, options.$1), [], options.dropValues));
+      return options.cb(compact(evaluate(options.$, template, options.$1), [], { dropValues: options.dropValues }));
     },
     [TemplateValueType.OBJECT](template, options) {
-      if (template === null && compact(null, [], options.dropValues) !== undefined) return null;
+      if (template === null && compact(null, [], { dropValues: options.dropValues }) !== undefined) return null;
       const result = {};
       let checkIf = [];
       let keep = false;
@@ -97,7 +97,7 @@ function process() {
             });
 
             if (result[destKey]?.length > 0) value.unshift(...result[destKey]);
-            result[destKey] = compact(value, [], options.dropValues);
+            result[destKey] = compact(value, [], { dropValues: options.dropValues });
             break;
           }
           case TemplateKeyType.DUPLICATE:
@@ -124,7 +124,7 @@ function process() {
             break;
         }
       }
-      return compact(result, checkIf, options.dropValues, keep);
+      return compact(result, checkIf, { dropValues: options.dropValues, $: options.$, $1: options.$1 }, keep);
     }
   };
 }

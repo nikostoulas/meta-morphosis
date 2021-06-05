@@ -17,13 +17,13 @@ describe('compact', function () {
 
     context('with some values in dropValues', function () {
       it('returns some values not in dropValues', function () {
-        compact([1, 2, 3], [], [1]).should.eql([2, 3]);
+        compact([1, 2, 3], [], { dropValues: [1] }).should.eql([2, 3]);
       });
     });
 
     context('with all values in dropValues', function () {
       it('returns undefined', function () {
-        should.equal(undefined, compact([1, 2, 3], [], [1, 2, 3]));
+        should.equal(undefined, compact([1, 2, 3], [], { dropValues: [1, 2, 3] }));
       });
     });
   });
@@ -55,18 +55,18 @@ describe('compact', function () {
 
     context('object with all values in dropValues', function () {
       it('returns undefined', function () {
-        should.equal(undefined, compact({ foo: 'bar', bar: 'foo', z: 'z' }, [], ['foo', 'bar', 'z']));
+        should.equal(undefined, compact({ foo: 'bar', bar: 'foo', z: 'z' }, [], { dropValues: ['foo', 'bar', 'z'] }));
       });
     });
     context('object with some values in dropValues', function () {
       it('returns the remaining values', function () {
-        compact({ foo: 'bar', bar: 'foo', z: 'z' }, [], ['foo', 'bar']).should.eql({ z: 'z' });
+        compact({ foo: 'bar', bar: 'foo', z: 'z' }, [], { dropValues: ['foo', 'bar'] }).should.eql({ z: 'z' });
       });
     });
 
     context('object with some values in dropValues for keys in keysThatMustExist', function () {
       it('returns undefined', function () {
-        should.equal(undefined, compact({ foo: 'bar', bar: 'foo', z: 'z' }, ['foo'], ['foo', 'bar']));
+        should.equal(undefined, compact({ foo: 'bar', bar: 'foo', z: 'z' }, ['foo'], { dropValues: ['foo', 'bar'] }));
       });
     });
 
@@ -94,10 +94,10 @@ describe('compact', function () {
     });
     context('that is in dropValues', function () {
       it('returns undefined', function () {
-        should.equal(undefined, compact(0, [], [0]));
-        should.equal(undefined, compact('', [], ['']));
-        should.equal(undefined, compact(false, [], [false]));
-        should.equal(undefined, compact(null, [], [null]));
+        should.equal(undefined, compact(0, [], { dropValues: [0] }));
+        should.equal(undefined, compact('', [], { dropValues: [''] }));
+        should.equal(undefined, compact(false, [], { dropValues: [false] }));
+        should.equal(undefined, compact(null, [], { dropValues: [null] }));
       });
     });
   });
