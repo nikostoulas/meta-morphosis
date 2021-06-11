@@ -117,7 +117,16 @@ function process() {
             break;
           }
           case TemplateKeyType.IF:
-            checkIf = template[key];
+            checkIf = template[key].filter(element => typeof element === 'string');
+            try {
+              if (template[key]
+                .filter(cb => typeof cb === 'function')
+                .map(cb => cb(options.$, options.$1))
+                .some(val => !val)) return;
+            } catch (err) {
+              if (!err.message?.includes('Cannot read property')) console.warn(`Warning: ${err.message}`);
+              return;
+            }
             break;
           case TemplateKeyType.KEEP:
             keep = template[key];

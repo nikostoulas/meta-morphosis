@@ -138,6 +138,27 @@ describe('transform', function () {
         });
       });
 
+      it('condition function throws an error and contained object is rejected', function () {
+        transform(
+          {
+            x: { a: '$.a' },
+            y: { b: '$.a.b' },
+            z: {
+              $if: [($, _1) => $.c],
+              note: 'outer condition fn returned true'
+            }
+          },
+          {
+            $: { a: { b: 2 }, b: 23 },
+            $1: { k: 5 },
+            dropValues: [null, undefined]
+          }
+        ).should.eql({
+          x: { a: { b: 2 } },
+          y: { b: 2 }
+        });
+      });
+
       it('inner condition is false', function () {
         transform(
           {
