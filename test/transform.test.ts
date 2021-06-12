@@ -144,7 +144,7 @@ describe('transform', function () {
             x: { a: '$.a' },
             y: { b: '$.a.b' },
             z: {
-              $if: [($, _1) => $.c],
+              $if: [($, _1) => $.c.d],
               note: 'outer condition fn returned true'
             }
           },
