@@ -245,6 +245,16 @@ transform({ ['$.foo']: 'foo', a: '$.bar', $if: ['a'] }, { $: { foo: 'bar' } }); 
 transform({ ['$.foo']: 'foo', a: '$.bar', $if: ['a'] }, { $: { foo: 'bar', bar: 'bar' } }); // { bar: 'foo', a: 'bar' }
 ```
 
+In addition to keys, the $\if array can contain functions. If at least one function returns false,
+the object won't be included in the final result.
+
+eg:
+```js
+transform({ ['$.foo']: 'foo', a: '$.bar', $if: [$ => false] }, { $: { foo: 'bar' } }); // undefined
+transform({ ['$.foo']: 'foo', a: '$.bar', $if: [$ => $.bar.length > 0] }, { $: { foo: 'bar', bar: 'bar' } }); // { bar: 'foo', a: 'bar' }
+transform({ ['$.foo']: 'foo', a: '$.bar', $if: [(_, $1) => !$1.erase] }, { $: { foo: 'bar', bar: 'bar' }, $1: { erase: true } }); // undefined
+```
+
 ### KEEP
 
 Sometimes you want an object to be included even if it is empty.

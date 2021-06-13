@@ -108,6 +108,185 @@ describe('transform', function () {
       });
     });
 
+    context('if contains condition function', function () {
+      it('both conditions hold true', function () {
+        transform(
+          {
+            x: { a: '$.a' },
+            y: { b: '$.a.b' },
+            z: {
+              $if: [($, $1) => ($.a.b + $.b) % $1.k === 0],
+              note: 'outer condition fn returned true',
+              w: {
+                $if: [(_, $1) => $1.k % 2 === 1],
+                note: 'inner condition fn returned true'
+              }
+            }
+          },
+          {
+            $: { a: { b: 2 }, b: 23 },
+            $1: { k: 5 },
+            dropValues: [null, undefined]
+          }
+        ).should.eql({
+          x: { a: { b: 2 } },
+          y: { b: 2 },
+          z: {
+            note: 'outer condition fn returned true',
+            w: { note: 'inner condition fn returned true' }
+          }
+        });
+      });
+
+      it('condition function throws an error and contained object is rejected', function () {
+        transform(
+          {
+            x: { a: '$.a' },
+            y: { b: '$.a.b' },
+            z: {
+              $if: [($, _1) => $.c.d],
+              note: 'outer condition fn returned true'
+            }
+          },
+          {
+            $: { a: { b: 2 }, b: 23 },
+            $1: { k: 5 },
+            dropValues: [null, undefined]
+          }
+        ).should.eql({
+          x: { a: { b: 2 } },
+          y: { b: 2 }
+        });
+      });
+
+      it('inner condition is false', function () {
+        transform(
+          {
+            x: { a: '$.a' },
+            y: { b: '$.a.b' },
+            z: {
+              $if: [($, $1) => ($.a.b + $.b) % $1.k === 0],
+              note: 'outer condition fn returned true',
+              w: {
+                $if: [(_, $1) => $1.k % 2 !== 1],
+                note: 'inner condition fn returned false'
+              }
+            }
+          },
+          {
+            $: { a: { b: 2 }, b: 23 },
+            $1: { k: 5 },
+            dropValues: [null, undefined]
+          }
+        ).should.eql({
+          x: { a: { b: 2 } },
+          y: { b: 2 },
+          z: {
+            note: 'outer condition fn returned true',
+          }
+        });
+      });
+
+      it('outer condition is false', function () {
+        transform(
+          {
+            x: { a: '$.a' },
+            y: { b: '$.a.b' },
+            z: {
+              $if: [($, $1) => ($.a.b + $.b) % $1.k !== 0],
+              note: 'outer condition fn returned true',
+              w: {
+                $if: [(_, $1) => $1.k % 2 !== 1],
+                note: 'inner condition fn returned false'
+              }
+            }
+          },
+          {
+            $: { a: { b: 2 }, b: 23 },
+            $1: { k: 5 },
+            dropValues: [null, undefined]
+          }
+        ).should.eql({
+          x: { a: { b: 2 } },
+          y: { b: 2 }
+        });
+      });
+
+      it('has both attribute and function that return true', function () {
+        transform(
+          {
+            x: { a: '$.a' },
+            y: { b: '$.a.b' },
+            z: {
+              a: 1,
+              b: 'random string',
+              $if: [($, $1) => ($.a.b + $.b) % $1.k === 0, 'a', 'b'],
+              note: 'condition fn returned true',
+            }
+          },
+          {
+            $: { a: { b: 2 }, b: 23 },
+            $1: { k: 5 },
+            dropValues: [null, undefined]
+          }
+        ).should.eql({
+          x: { a: { b: 2 } },
+          y: { b: 2 },
+          z: {
+            a: 1,
+            b: 'random string',
+            note: 'condition fn returned true',
+          }
+        });
+      });
+
+      it('has both attribute and function where function returns false', function () {
+        transform(
+          {
+            x: { a: '$.a' },
+            y: { b: '$.a.b' },
+            z: {
+              a: 1,
+              b: 'random string',
+              $if: [($, $1) => ($.a.b + $.b) % $1.k !== 0, 'a', 'b'],
+              note: 'condition fn returned true',
+            }
+          },
+          {
+            $: { a: { b: 2 }, b: 23 },
+            $1: { k: 5 },
+            dropValues: [null, undefined]
+          }
+        ).should.eql({
+          x: { a: { b: 2 } },
+          y: { b: 2 }
+        });
+      });
+
+      it('has both attribute and function where at least one attribute does not exist', function () {
+        transform(
+          {
+            x: { a: '$.a' },
+            y: { b: '$.a.b' },
+            z: {
+              a: 1,
+              b: 'random string',
+              $if: [($, $1) => ($.a.b + $.b) % $1.k === 0, 'a', 'unknown'],
+              note: 'condition fn returned true',
+            }
+          },
+          {
+            $: { a: { b: 2 }, b: 23 },
+            $1: { k: 5 },
+            dropValues: [null, undefined]
+          }
+        ).should.eql({
+          x: { a: { b: 2 } },
+          y: { b: 2 }
+        });
+      });
+    });
+
     context('if is used and some keys are present', function () {
       it('returns undefined', function () {
         should.equal(
