@@ -330,12 +330,19 @@ describe('transform', function () {
 
       it('preserves empty array for more complex expressions', function () {
         transform(
-          { a: 1, b: ['$.y', '$keep'], c: { d: [], e: ['$.x', '$keep'], f: [$ => ($.x - 1) || undefined, '$keep']} },
+          { a: 1, b: ['$.y', '$keep'], c: { d: [], e: ['$.x', '$keep'], f: [$ => ($.x - 1) || undefined, '$keep'] } },
           {
             $: { x: 1 },
             dropValues: [null, undefined]
           }
-        ).should.eql({ a: 1, b: [], c: { e: [1], f: []} });
+        ).should.eql({ a: 1, b: [], c: { e: [1], f: [] } });
+      });
+
+      it('preserves empty array for iterable', function () {
+        transform(
+          { a: 1, 'b[$.y]': '$', b: ['$keep'] },
+          { $: { y: [] } }
+        ).should.eql({ a: 1, b: [] });
       });
     });
 
