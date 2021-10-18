@@ -266,6 +266,13 @@ eg:
 transform({ $keep:true }, { }); // {}
 ```
 
+Keep can also be used inside arrays to ensure that if the array is empty after the transformation, it is not removed from the end result
+
+eg:
+```js
+transform({ a: ['$keep', undefined, null] }, { }); // {a: []} 
+```
+
 ## ARRAY
 
 As seen in some examples of object you can directly use arrays as deplates. The values of the array can be a valid template value
