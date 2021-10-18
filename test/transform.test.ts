@@ -317,6 +317,28 @@ describe('transform', function () {
       });
     });
 
+    context('keep inside array', function () {
+      it('preserves empty array of a template attribute', function () {
+        transform(
+          { a: 1, b: [undefined, null, '$keep'] },
+          {
+            $: { x: 1 },
+            dropValues: [null, undefined]
+          }
+        ).should.eql({ a: 1, b: [] });
+      });
+
+      it('preserves empty array for more complex expressions', function () {
+        transform(
+          { a: 1, b: ['$.y', '$keep'], c: { d: [], e: ['$.x', '$keep'], f: [$ => ($.x - 1) || undefined, '$keep']} },
+          {
+            $: { x: 1 },
+            dropValues: [null, undefined]
+          }
+        ).should.eql({ a: 1, b: [], c: { e: [1], f: []} });
+      });
+    });
+
     context('Both keep and if are used and object does not contain all keys', function () {
       it('returns empty object', function () {
         transform(
