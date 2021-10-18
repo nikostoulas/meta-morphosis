@@ -7,9 +7,7 @@ export function compact($, keysThatMustExist = [], dropValues: any[] = [undefine
     const enhancedDropValues = [...dropValues, '$keep'];
     let keepEmpty = false;
     $ = $.filter(o => {
-      if (o === '$keep') {
-        keepEmpty = true;
-      }
+      if (o === '$keep')  keepEmpty = true;
       return enhancedDropValues.indexOf(o) === -1;
     });
     if ($.length === 0 && keepEmpty) return $;
