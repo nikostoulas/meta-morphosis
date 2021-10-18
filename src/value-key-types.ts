@@ -4,7 +4,8 @@ export enum TemplateKeyType {
   SIMPLE,
   TEMPLATE,
   IF,
-  KEEP
+  KEEP,
+  PRESERVE_EMPTY_ARRAYS
 }
 
 export enum TemplateValueType {

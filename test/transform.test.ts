@@ -329,6 +329,26 @@ describe('transform', function () {
       });
     });
 
+    context('preserve empty arrays in object if asked', function () {
+      it('returns the empty array for a specific level', function () {
+        transform(
+          { $preserveEmptyArrays: true, a: 1, b: [], c: { d: [] } },
+          {
+            $: { a: 1 },
+          }
+        ).should.eql({ a: 1, b: [] });
+      });
+
+      it('returns empty arrays for all levels', function () {
+        transform(
+          { $preserveEmptyArrays: true, a: 1, b: [], c: { $preserveEmptyArrays: true, d: [] } },
+          {
+            $: { a: 1 },
+          }
+        ).should.eql({ a: 1, b: [], c: { d: [] } });
+      });
+    });
+
     context('template key is type array', function () {
       context('Obj is not an array', function () {
         it('returns undefined', function () {

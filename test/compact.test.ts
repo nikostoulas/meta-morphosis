@@ -7,6 +7,10 @@ describe('compact', function () {
       it('returns undefined', function () {
         should.equal(undefined, compact([]));
       });
+
+      it('returns empty if explicitly asked', function () {
+        compact([], [], [undefined], false, true).should.eql([]);
+      });
     });
 
     context('with some values', function () {

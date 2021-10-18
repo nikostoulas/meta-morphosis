@@ -266,6 +266,21 @@ eg:
 transform({ $keep:true }, { }); // {}
 ```
 
+### PRESERVE_EMPTY_ARRAYS
+
+An option to not prune empty arrays from the object. Use \$preserveEmptyArrays:true special key.
+By default, this parameter is considered false.
+
+```js
+transform({ $preserveEmptyArrays:true, a: 1, b: [], c: { d: [] } }, { {a: 1} }); // {a: 1, b: []}
+```
+
+Note that it does not work recursively. You will have to specify it in every object level you want to retain the empty arrays.
+
+```js
+transform({ $preserveEmptyArrays:true, a: 1, b: [], c: { $preserveEmptyArrays: true, d: [] } }, { {a: 1} }); // {a: 1, b: [], c: { d: [] }}
+```
+
 ## ARRAY
 
 As seen in some examples of object you can directly use arrays as deplates. The values of the array can be a valid template value

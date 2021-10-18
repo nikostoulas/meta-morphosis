@@ -20,11 +20,12 @@ export function transform<T>(
     dropValues = ['', null, undefined],
     $1,
     $,
-    cb = x => x
-  }: { dropValues?: any[]; $1?: any; $: any; cb?: (key: any) => any }
+    cb = x => x,
+    preserveEmptyArrays
+  }: { dropValues?: any[]; $1?: any; $: any; cb?: (key: any) => any, preserveEmptyArrays?: boolean }
 ): Partial<T> {
   const propertyType = getValueType(template);
-  return process()[propertyType](template, { dropValues, $1, $, transform, cb });
+  return process()[propertyType](template, { dropValues, $1, $, transform, cb, preserveEmptyArrays });
 }
 
 function getValueType(template) {
@@ -63,7 +64,13 @@ function process() {
       }
     },
     [TemplateValueType.ARRAY](template, options) {
-      return compact(template.map(t => transform(t, options)));
+      return compact(
+        template.map(t => transform(t, options)),
+        [],
+        [undefined],
+        false,
+        options.preserveEmptyArrays
+        );
     },
     [TemplateValueType.JSON_PATH](template, options) {
       return options.cb(compact(evaluate(options.$, template, options.$1), [], options.dropValues));
@@ -73,6 +80,7 @@ function process() {
       const result = {};
       let checkIf = [];
       let keep = false;
+      let preserveEmptyArrays = false;
       // tslint:disable-next-line: forin
       for (let key in template) {
         let keyType = getTemplateKeyType(key);
@@ -104,7 +112,7 @@ function process() {
             destKey = getDuplicateDestKey(key);
           // tslint:disable-next-line: no-switch-case-fall-through
           case TemplateKeyType.SIMPLE: {
-            let value = transform(template[key], options);
+            let value = transform(template[key], {...options, preserveEmptyArrays});
             if (Array.isArray(value) && result[destKey]?.length > 0) value.unshift(...result[destKey]);
             result[destKey] = value;
             break;
@@ -131,9 +139,12 @@ function process() {
           case TemplateKeyType.KEEP:
             keep = template[key];
             break;
+          case TemplateKeyType.PRESERVE_EMPTY_ARRAYS:
+            preserveEmptyArrays = template[key];
+            break;
         }
       }
-      return compact(result, checkIf, options.dropValues, keep);
+      return compact(result, checkIf, options.dropValues, keep, preserveEmptyArrays);
     }
   };
 }
@@ -148,6 +159,7 @@ function getTemplateKeyType(key: string) {
   if (key.indexOf('.$') > 0 && key.indexOf('..$') === -1) return TemplateKeyType.DUPLICATE;
   if (key === '$if') return TemplateKeyType.IF;
   if (key === '$keep') return TemplateKeyType.KEEP;
+  if (key === '$preserveEmptyArrays') return TemplateKeyType.PRESERVE_EMPTY_ARRAYS;
   return TemplateKeyType.SIMPLE;
 }
 
