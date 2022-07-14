@@ -182,7 +182,7 @@ describe('transform', function () {
           x: { a: { b: 2 } },
           y: { b: 2 },
           z: {
-            note: 'outer condition fn returned true',
+            note: 'outer condition fn returned true'
           }
         });
       });
@@ -221,7 +221,7 @@ describe('transform', function () {
               a: 1,
               b: 'random string',
               $if: [($, $1) => ($.a.b + $.b) % $1.k === 0, 'a', 'b'],
-              note: 'condition fn returned true',
+              note: 'condition fn returned true'
             }
           },
           {
@@ -235,7 +235,7 @@ describe('transform', function () {
           z: {
             a: 1,
             b: 'random string',
-            note: 'condition fn returned true',
+            note: 'condition fn returned true'
           }
         });
       });
@@ -249,7 +249,7 @@ describe('transform', function () {
               a: 1,
               b: 'random string',
               $if: [($, $1) => ($.a.b + $.b) % $1.k !== 0, 'a', 'b'],
-              note: 'condition fn returned true',
+              note: 'condition fn returned true'
             }
           },
           {
@@ -272,7 +272,7 @@ describe('transform', function () {
               a: 1,
               b: 'random string',
               $if: [($, $1) => ($.a.b + $.b) % $1.k === 0, 'a', 'unknown'],
-              note: 'condition fn returned true',
+              note: 'condition fn returned true'
             }
           },
           {
@@ -339,10 +339,7 @@ describe('transform', function () {
       });
 
       it('preserves empty array for iterable', function () {
-        transform(
-          { a: 1, 'b[$.y]': '$', b: ['$keep'] },
-          { $: { y: [] } }
-        ).should.eql({ a: 1, b: [] });
+        transform({ a: 1, 'b[$.y]': '$', b: ['$keep'] }, { $: { y: [] } }).should.eql({ a: 1, b: [] });
       });
     });
 
