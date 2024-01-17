@@ -96,8 +96,11 @@ function process() {
               return transform(template[key], { ...options, $ });
             });
 
-            if (result[destKey]?.length > 0) value.unshift(...result[destKey]);
-            result[destKey] = compact(value, [], options.dropValues);
+            if (result[destKey]?.length > 0) {
+              value?.forEach(v => result[destKey].push(v));
+            } else {
+              result[destKey] = compact(value, [], options.dropValues);
+            }
             break;
           }
           case TemplateKeyType.DUPLICATE:
@@ -105,24 +108,34 @@ function process() {
           // tslint:disable-next-line: no-switch-case-fall-through
           case TemplateKeyType.SIMPLE: {
             let value = transform(template[key], options);
-            if (Array.isArray(value) && result[destKey]?.length > 0) value.unshift(...result[destKey]);
-            result[destKey] = value;
+            if (result[destKey]?.length > 0) {
+              value?.forEach(v => result[destKey].push(v));
+            } else {
+              result[destKey] = value;
+            }
             break;
           }
           case TemplateKeyType.TEMPLATE: {
             let newKey = transform(key, options);
             let value = transform(template[key], options);
-            if (Array.isArray(value) && result[newKey]?.length > 0) value.unshift(...result[newKey]);
-            result[newKey] = value;
+            if (result[newKey]?.length > 0) {
+              value?.forEach(v => result[newKey].push(v));
+            } else {
+              result[newKey] = value;
+            }
             break;
           }
           case TemplateKeyType.IF:
             checkIf = template[key].filter(element => typeof element === 'string');
             try {
-              if (template[key]
-                .filter(cb => typeof cb === 'function')
-                .map(cb => cb(options.$, options.$1))
-                .some(val => !val)) return;
+              if (
+                template[key]
+                  .filter(cb => typeof cb === 'function')
+                  .map(cb => cb(options.$, options.$1))
+                  .some(val => !val)
+              ) {
+                return;
+              }
             } catch (err) {
               if (!err.message?.includes('Cannot read propert')) console.warn(`Warning: ${err.message}`);
               return;

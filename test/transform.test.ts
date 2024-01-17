@@ -330,7 +330,7 @@ describe('transform', function () {
 
       it('preserves empty array for more complex expressions', function () {
         transform(
-          { a: 1, b: ['$.y', '$keep'], c: { d: [], e: ['$.x', '$keep'], f: [$ => ($.x - 1) || undefined, '$keep'] } },
+          { a: 1, b: ['$.y', '$keep'], c: { d: [], e: ['$.x', '$keep'], f: [$ => $.x - 1 || undefined, '$keep'] } },
           {
             $: { x: 1 },
             dropValues: [null, undefined]
@@ -367,6 +367,7 @@ describe('transform', function () {
           should.equal(undefined, transform({ 'a[$]': '$' }, { $: [] }));
         });
       });
+
       context('obj is an array', function () {
         it('returns object with array', function () {
           transform(
@@ -443,6 +444,10 @@ describe('transform', function () {
       it('evaluates key', function () {
         transform({ '$.b': '$.a' }, { $: { b: 'foo', a: 'bar' } }).should.eql({ foo: 'bar' });
       });
+
+      it('returns undefined', function () {
+        should.equal(undefined, transform({ '$.b': '$.a' }, { $: { b: 'foo', a: [] } }));
+      });
     });
 
     context('template key is Duplicate', function () {
@@ -456,6 +461,21 @@ describe('transform', function () {
           });
           transform({ '$.c': '$.b', 'a[$.a]': '$' }, { $: { a: [1, 2], b: [3, 4], c: 'a' } }).should.eql({
             a: [3, 4, 1, 2]
+          });
+          transform({ a: [1, 2], 'a.$1': [{ $if: [$ => $], e: '$' }] }, { $: [3, 4] }).should.eql({ a: [1, 2, 3, 4] });
+        });
+
+        it('keeps only the first array if the second is empty', function () {
+          transform({ a: [1, 2], 'a[$.c]': '$' }, { $: { b: [] } }).should.eql({ a: [1, 2] });
+          transform({ a: [1, 2], 'a[$.b]': '$' }, { $: { b: [] } }).should.eql({ a: [1, 2] });
+          transform({ a: [1, 2], 'a.$1': [{ e: '$.empty' }] }, { $: [3, 4] }).should.eql({ a: [1, 2] });
+          transform({ a: [1, 2], 'a.$1': [{ $if: ['e'], e: '$.empty' }] }, { $: [3, 4] }).should.eql({ a: [1, 2] });
+          transform({ a: [1, 2], 'a.$1': [{ $if: [$ => $.empty], e: '$' }] }, { $: [3, 4] }).should.eql({ a: [1, 2] });
+        });
+
+        it('ignores none array values', function () {
+          transform({ a: [1, 2], 'a[$.c]': '3' }, { $: { b: [] } }).should.eql({
+            a: [1, 2]
           });
         });
       });
