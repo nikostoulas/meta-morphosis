@@ -462,7 +462,9 @@ describe('transform', function () {
           transform({ '$.c': '$.b', 'a[$.a]': '$' }, { $: { a: [1, 2], b: [3, 4], c: 'a' } }).should.eql({
             a: [3, 4, 1, 2]
           });
-          transform({ a: [1, 2], 'a.$1': [{ $if: [$ => $], e: '$' }] }, { $: [3, 4] }).should.eql({ a: [1, 2, 3, 4] });
+          transform({ a: [1, 2], 'a.$1': [{ $if: [$ => $], e: '$' }] }, { $: [3, 4] }).should.eql({
+            a: [1, 2, { e: [3, 4] }]
+          });
         });
 
         it('keeps only the first array if the second is empty', function () {
